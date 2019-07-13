@@ -2,13 +2,23 @@
 
 #include <Render/Renderer.hpp>
 #include <Render/Shader.hpp>
+#include <Serialization/ObjReader.hpp>
 
 #include <iostream>
+#include <vector>
 
 SandboxApplication::SandboxApplication()
   : Crane::Application::Application()
 {
-  std::cerr << "SandboxApplication constructor" << std::endl;
+  /****************************************************************************/
+  /* Load models                                                              */
+  /****************************************************************************/
+  std::vector<float> vertices;
+  std::vector<unsigned int> indices;
+  if (!Crane::ObjReader::read("resources/models/cube.obj", vertices, indices))
+  {
+    exit(EXIT_FAILURE);
+  }
 
   /****************************************************************************/
   /* Arrays and buffers setup                                                 */
@@ -16,19 +26,16 @@ SandboxApplication::SandboxApplication()
   m_VertexArray.create();
   m_VertexArray.bind();
 
-  float vertices[9] = {
-  //    x      y     z
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
-  };
-
-  m_VertexBuffer.create(sizeof(vertices), (void*)&vertices[0]);
+  m_VertexBuffer.create(vertices.size() * sizeof(float), (void*)&vertices[0]);
   m_VertexBuffer.setLayout({
-    { "position", Crane::ShaderDatatype::Float3 }
+    { "position", Crane::ShaderDatatype::Float3 },
+    { "uvs", Crane::ShaderDatatype::Float2 },
+    { "normal", Crane::ShaderDatatype::Float3 }
   });
-
   m_VertexArray.addVertexBuffer(&m_VertexBuffer);
+
+  m_IndexBuffer.create(indices.size() * sizeof(unsigned int), &indices[0]);
+  m_VertexArray.setIndexBuffer(&m_IndexBuffer);
 
   /****************************************************************************/
   /* Shaders setup                                                            */
@@ -111,5 +118,5 @@ void SandboxApplication::onRender()
   Crane::Application::onRender();
   //std::cout << "Render" << std::endl;
 
-  Crane::Renderer::render(m_VertexArray, m_ShaderProgram);
+  Crane::Renderer::renderIndexed(m_VertexArray, m_ShaderProgram);
 }
