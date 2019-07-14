@@ -4,9 +4,15 @@
 #include <Render/Shader.hpp>
 #include <Serialization/BmpReader.hpp>
 #include <Serialization/ObjReader.hpp>
+#include <Window/Input.hpp>
 
 #include <iostream>
 #include <vector>
+
+Crane::Application* Crane::Application::createApplication()
+{
+  return new SandboxApplication();
+}
 
 SandboxApplication::SandboxApplication()
   : Crane::Application::Application(), m_Camera(-1.f, 1.f, -1.f, 1.f)
@@ -118,6 +124,14 @@ void SandboxApplication::onEvent(Crane::Event* e)
               << re->getHeight() << ")" 
               << std::endl;
   }
+  else if (e->getType() == Crane::Event::KeyPressed)
+  {
+    Crane::KeyPressedEvent * ke = (Crane::KeyPressedEvent*)e;
+    if (ke->getKey() == Crane::Keyboard::Escape)
+    {
+      end();
+    }
+  }
 }
 
 void SandboxApplication::onUpdate()
@@ -125,7 +139,24 @@ void SandboxApplication::onUpdate()
   Crane::Application::onUpdate();
   //std::cout << "Update" << std::endl;
 
-  m_Camera.move({ 0.001f, 0.001f, 0.f });
+  if (Crane::Input::isKeyPressed(Crane::Keyboard::Left))
+  {
+    m_Camera.move({  0.01f, 0.f, 0.f });
+  }
+  else if (Crane::Input::isKeyPressed(Crane::Keyboard::Right))
+  {
+    m_Camera.move({ -0.01f, 0.f, 0.f });
+  }
+
+  if (Crane::Input::isKeyPressed(Crane::Keyboard::Up))
+  {
+    m_Camera.move({ 0.f, -0.01f, 0.f });
+  }
+  else if (Crane::Input::isKeyPressed(Crane::Keyboard::Down))
+  {
+    m_Camera.move({ 0.f, 0.01f, 0.f });
+  }
+
   m_Camera.rotate(0.01f);
   m_Camera.recomputeMatrices();
 }

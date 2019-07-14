@@ -1,7 +1,6 @@
-#include "SandboxApplication.hpp"
+#include <Core/Application.hpp>
 
 int main() {
-  SandboxApplication* app = new SandboxApplication();
-  app->run();
+  Crane::Application::get()->run();
   return 0;
 }
