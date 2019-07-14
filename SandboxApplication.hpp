@@ -1,5 +1,7 @@
 #include <Core/Application.hpp>
 #include <Render/IndexBuffer.hpp>
+#include <Render/OrthographicCamera.hpp>
+#include <Render/Texture.hpp>
 #include <Render/ShaderProgram.hpp>
 #include <Render/VertexArray.hpp>
 #include <Render/VertexBuffer.hpp>
@@ -20,5 +22,9 @@ private:
   Crane::VertexBuffer m_VertexBuffer;
   Crane::IndexBuffer m_IndexBuffer;
 
+  Crane::Texture m_Texture;
+
   Crane::ShaderProgram m_ShaderProgram;
+
+  Crane::OrthographicCamera m_Camera;
 };

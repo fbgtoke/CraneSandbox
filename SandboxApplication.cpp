@@ -2,20 +2,21 @@
 
 #include <Render/Renderer.hpp>
 #include <Render/Shader.hpp>
+#include <Serialization/BmpReader.hpp>
 #include <Serialization/ObjReader.hpp>
 
 #include <iostream>
 #include <vector>
 
 SandboxApplication::SandboxApplication()
-  : Crane::Application::Application()
+  : Crane::Application::Application(), m_Camera(-1.f, 1.f, -1.f, 1.f)
 {
   /****************************************************************************/
   /* Load models                                                              */
   /****************************************************************************/
   std::vector<float> vertices;
   std::vector<unsigned int> indices;
-  if (!Crane::ObjReader::read("resources/models/cube.obj", vertices, indices))
+  if (!Crane::ObjReader::read("resources/models/quad.obj", vertices, indices))
   {
     exit(EXIT_FAILURE);
   }
@@ -36,6 +37,18 @@ SandboxApplication::SandboxApplication()
 
   m_IndexBuffer.create(indices.size() * sizeof(unsigned int), &indices[0]);
   m_VertexArray.setIndexBuffer(&m_IndexBuffer);
+
+  /****************************************************************************/
+  /* Texture setup                                                            */
+  /****************************************************************************/
+  std::size_t w, h;
+  std::vector<unsigned char> data;
+  if(!Crane::BmpReader::read("resources/textures/quad.bmp", w, h, data))
+  {
+    exit(EXIT_FAILURE);
+  }
+
+  m_Texture.create(w, h, &data[0]);
 
   /****************************************************************************/
   /* Shaders setup                                                            */
@@ -111,6 +124,10 @@ void SandboxApplication::onUpdate()
 {
   Crane::Application::onUpdate();
   //std::cout << "Update" << std::endl;
+
+  m_Camera.move({ 0.001f, 0.001f, 0.f });
+  m_Camera.rotate(0.01f);
+  m_Camera.recomputeMatrices();
 }
 
 void SandboxApplication::onRender()
@@ -118,5 +135,6 @@ void SandboxApplication::onRender()
   Crane::Application::onRender();
   //std::cout << "Render" << std::endl;
 
-  Crane::Renderer::renderIndexed(m_VertexArray, m_ShaderProgram);
+  m_ShaderProgram.setUniformMat4f(0, &m_Camera.getViewProjectionMatrix()[0][0]);
+  Crane::Renderer::renderIndexed(m_VertexArray, m_ShaderProgram, m_Texture);
 }
