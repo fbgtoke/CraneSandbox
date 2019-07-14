@@ -1,4 +1,5 @@
 #include <Core/Application.hpp>
+#include <Core/Time.hpp>
 #include <Render/IndexBuffer.hpp>
 #include <Render/OrthographicCamera.hpp>
 #include <Render/Texture.hpp>
@@ -27,4 +28,6 @@ private:
   Crane::ShaderProgram m_ShaderProgram;
 
   Crane::OrthographicCamera m_Camera;
+
+  Crane::Time m_LastFrame;
 };

@@ -6,8 +6,11 @@
 #include <Serialization/ObjReader.hpp>
 #include <Window/Input.hpp>
 
+#include <glm/vec3.hpp>
+
 #include <iostream>
 #include <vector>
+
 
 Crane::Application* Crane::Application::createApplication()
 {
@@ -138,23 +141,28 @@ void SandboxApplication::onUpdate()
 {
   Crane::Application::onUpdate();
   //std::cout << "Update" << std::endl;
+  Crane::Time deltatime = Crane::Time::getGlobalTime() - m_LastFrame;
+  m_LastFrame = Crane::Time::getGlobalTime();
+
+  std::cout << "Frame time: " << deltatime.asSeconds() << "s ("
+            << 1.f/deltatime.asSeconds() << "fps)" << std::endl;
 
   if (Crane::Input::isKeyPressed(Crane::Keyboard::Left))
   {
-    m_Camera.move({  0.01f, 0.f, 0.f });
+    m_Camera.move(glm::vec3(1.f, 0.f, 0.f) * deltatime.asSeconds());
   }
   else if (Crane::Input::isKeyPressed(Crane::Keyboard::Right))
   {
-    m_Camera.move({ -0.01f, 0.f, 0.f });
+    m_Camera.move(glm::vec3(-1.f, 0.f, 0.f) * deltatime.asSeconds());
   }
 
   if (Crane::Input::isKeyPressed(Crane::Keyboard::Up))
   {
-    m_Camera.move({ 0.f, -0.01f, 0.f });
+    m_Camera.move(glm::vec3(0.f, -1.f, 0.f) * deltatime.asSeconds());
   }
   else if (Crane::Input::isKeyPressed(Crane::Keyboard::Down))
   {
-    m_Camera.move({ 0.f, 0.01f, 0.f });
+    m_Camera.move(glm::vec3(0.f, 1.f, 0.f) * deltatime.asSeconds());
   }
 
   m_Camera.rotate(0.01f);
