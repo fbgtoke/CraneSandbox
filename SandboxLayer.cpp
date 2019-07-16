@@ -54,11 +54,8 @@ SandboxLayer::SandboxLayer()
   vertex_shader.create(Crane::Shader::Vertex);
   vertex_shader.compileFromFile("resources/shaders/simple.vert");
   if (!vertex_shader.isCompiled())
-  {
-    std::cerr << vertex_shader.getInfoLog() << std::endl;
-    
+  {    
     vertex_shader.destroy();
-
     exit(EXIT_FAILURE);
   }
 
@@ -67,11 +64,8 @@ SandboxLayer::SandboxLayer()
   fragment_shader.compileFromFile("resources/shaders/simple.frag");
   if (!fragment_shader.isCompiled())
   {
-    std::cerr << fragment_shader.getInfoLog() << std::endl;
-
     vertex_shader.destroy();
     fragment_shader.destroy();
-
     exit(EXIT_FAILURE);
   }
 
