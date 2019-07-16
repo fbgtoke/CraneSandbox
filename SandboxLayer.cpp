@@ -95,6 +95,44 @@ void SandboxLayer::onUpdate(Crane::Time deltatime)
   std::cout << "Frame time: " << deltatime.asSeconds() << "s ("
             << 1.f/deltatime.asSeconds() << "fps)" << std::endl;
 
+  /* Transform controls */
+  if (Crane::Input::isKeyPressed(Crane::Keyboard::A))
+  {
+    m_Transform.move(glm::vec3(-1.f, 0.f, 0.f) * deltatime.asSeconds());
+  }
+  else if (Crane::Input::isKeyPressed(Crane::Keyboard::D))
+  {
+    m_Transform.move(glm::vec3(1.f, 0.f, 0.f) * deltatime.asSeconds());
+  }
+
+  if (Crane::Input::isKeyPressed(Crane::Keyboard::W))
+  {
+    m_Transform.move(glm::vec3(0.f, 1.f, 0.f) * deltatime.asSeconds());
+  }
+  else if (Crane::Input::isKeyPressed(Crane::Keyboard::S))
+  {
+    m_Transform.move(glm::vec3(0.f, -1.f, 0.f) * deltatime.asSeconds());
+  }
+
+  if (Crane::Input::isKeyPressed(Crane::Keyboard::Z))
+  {
+    m_Transform.scale(glm::vec3(0.1f) * deltatime.asSeconds());
+  }
+  else if (Crane::Input::isKeyPressed(Crane::Keyboard::C))
+  {
+    m_Transform.scale(glm::vec3(-0.1f) * deltatime.asSeconds());
+  }
+
+  if (Crane::Input::isKeyPressed(Crane::Keyboard::Q))
+  {
+    m_Transform.rotate(glm::vec3(0.f, 0.f, 0.1f) * deltatime.asSeconds());
+  }
+  else if (Crane::Input::isKeyPressed(Crane::Keyboard::E))
+  {
+    m_Transform.rotate(glm::vec3(0.f, 0.f, -0.1f) * deltatime.asSeconds());
+  }
+
+  /* Camera controls */
   if (Crane::Input::isKeyPressed(Crane::Keyboard::Left))
   {
     m_Camera.move(glm::vec3(1.f, 0.f, 0.f) * deltatime.asSeconds());
@@ -113,8 +151,17 @@ void SandboxLayer::onUpdate(Crane::Time deltatime)
     m_Camera.move(glm::vec3(0.f, 1.f, 0.f) * deltatime.asSeconds());
   }
 
-  m_Camera.rotate(0.01f);
+  if (Crane::Input::isKeyPressed(Crane::Keyboard::PageUp))
+  {
+    m_Camera.rotate(0.2f * deltatime.asSeconds());
+  }
+  else if (Crane::Input::isKeyPressed(Crane::Keyboard::PageDown))
+  {
+    m_Camera.rotate(-0.2f * deltatime.asSeconds());
+  }
+
   m_Camera.recomputeMatrices();
+  m_Transform.recomputeMatrix();
 }
 
 void SandboxLayer::onRender() const
@@ -122,5 +169,6 @@ void SandboxLayer::onRender() const
   Crane::Layer::onRender();
 
   m_ShaderProgram.setUniformMat4f(0, &m_Camera.getViewProjectionMatrix()[0][0]);
+  m_ShaderProgram.setUniformMat4f(1, &m_Transform.getTransformMatrix()[0][0]);
   Crane::Renderer::renderIndexed(m_VertexArray, m_ShaderProgram, m_Texture);
 }

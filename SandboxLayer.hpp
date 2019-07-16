@@ -21,4 +21,6 @@ private:
   Crane::OrthographicCamera m_Camera;
 
   Crane::Time m_LastFrame;
+
+  Crane::Transform m_Transform;
 };
