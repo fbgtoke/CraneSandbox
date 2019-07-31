@@ -15,6 +15,7 @@ private:
   Crane::IndexBuffer m_IndexBuffer;
 
   Crane::Texture m_Texture;
+  Crane::Font m_Font;
 
   Crane::ShaderProgram m_ShaderProgram;
 

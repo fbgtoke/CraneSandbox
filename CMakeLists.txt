@@ -14,9 +14,11 @@ set(CMAKE_INSTALL_PREFIX "/home/fabio/Documents/CraneSandbox/build")
 
 find_package(Crane REQUIRED)
 find_package(GLM REQUIRED)
+find_package(Freetype REQUIRED)
 
 include_directories(${CRANE_INCLUDE_DIRS})
 include_directories(${GLM_INCLUDE_DIRS})
+include_directories(${FREETYPE_INCLUDE_DIRS})
 
 link_directories(${CRANE_LIBRARY_DIRS})
 

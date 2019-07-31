@@ -44,8 +44,12 @@ SandboxLayer::SandboxLayer()
   {
     exit(EXIT_FAILURE);
   }
-
   m_Texture.create(w, h, &data[0]);
+
+  if (!m_Font.loadFromFile("resources/fonts/font.ttf"))
+  {
+    exit(EXIT_FAILURE);
+  }
 
   /****************************************************************************/
   /* Shaders setup                                                            */
@@ -168,7 +172,14 @@ void SandboxLayer::onRender() const
 {
   Crane::Layer::onRender();
 
-  m_ShaderProgram.setUniformMat4f(0, &m_Camera.getViewProjectionMatrix()[0][0]);
-  m_ShaderProgram.setUniformMat4f(1, &m_Transform.getTransformMatrix()[0][0]);
-  Crane::Renderer::renderIndexed(m_VertexArray, m_ShaderProgram, m_Texture);
+  m_ShaderProgram.use();
+
+  m_ShaderProgram.setUniformMat4f("VP", &m_Camera.getViewProjectionMatrix()[0][0]);
+  m_ShaderProgram.setUniformMat4f("TG", &m_Transform.getTransformMatrix()[0][0]);
+  Crane::Renderer::renderIndexed(
+    m_VertexArray,
+    m_ShaderProgram,
+    *m_Font.getCharacterTexture('A')
+    //m_Texture
+  );
 }
