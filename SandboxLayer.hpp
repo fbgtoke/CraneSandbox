@@ -15,13 +15,15 @@ private:
   Crane::IndexBuffer* m_IndexBuffer;
 
   Crane::Texture m_Texture;
+  Crane::Texture m_Texture2;
   Crane::Font m_Font;
 
   Crane::ShaderProgram* m_ShaderProgram;
 
-  Crane::OrthographicCamera m_Camera;
+  Crane::PerspectiveCamera m_Camera;
 
   Crane::Time m_LastFrame;
 
   Crane::Transform m_Transform;
+  Crane::Transform m_Transform2;
 };
