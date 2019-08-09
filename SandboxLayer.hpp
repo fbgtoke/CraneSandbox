@@ -10,14 +10,14 @@ protected:
   void onRender() const override;
 
 private:
-  Crane::VertexArray m_VertexArray;
-  Crane::VertexBuffer m_VertexBuffer;
-  Crane::IndexBuffer m_IndexBuffer;
+  Crane::VertexArray* m_VertexArray;
+  Crane::VertexBuffer* m_VertexBuffer;
+  Crane::IndexBuffer* m_IndexBuffer;
 
   Crane::Texture m_Texture;
   Crane::Font m_Font;
 
-  Crane::ShaderProgram m_ShaderProgram;
+  Crane::ShaderProgram* m_ShaderProgram;
 
   Crane::OrthographicCamera m_Camera;
 

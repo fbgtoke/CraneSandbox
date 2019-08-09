@@ -1,7 +1,6 @@
 #include "SandboxLayer.hpp"
 
-#include <glm/vec3.hpp>
-
+#include <fstream>
 #include <iostream>
 #include <vector>
 
@@ -21,19 +20,23 @@ SandboxLayer::SandboxLayer()
   /****************************************************************************/
   /* Arrays and buffers setup                                                 */
   /****************************************************************************/
-  m_VertexArray.create();
-  m_VertexArray.bind();
+  m_VertexArray = Crane::VertexArray::create();
+  m_VertexArray->bind();
 
-  m_VertexBuffer.create(vertices.size() * sizeof(float), (void*)&vertices[0]);
-  m_VertexBuffer.setLayout({
+  m_VertexBuffer = Crane::VertexBuffer::create(
+    vertices.size() * sizeof(float), (void*)&vertices[0]
+  );
+  m_VertexBuffer->setLayout({
     { "position", Crane::ShaderDatatype::Float3 },
     { "uvs", Crane::ShaderDatatype::Float2 },
     { "normal", Crane::ShaderDatatype::Float3 }
   });
-  m_VertexArray.addVertexBuffer(&m_VertexBuffer);
+  m_VertexArray->addVertexBuffer(m_VertexBuffer);
 
-  m_IndexBuffer.create(indices.size() * sizeof(unsigned int), &indices[0]);
-  m_VertexArray.setIndexBuffer(&m_IndexBuffer);
+  m_IndexBuffer = Crane::IndexBuffer::create(
+    indices.size() * sizeof(unsigned int), &indices[0]
+  );
+  m_VertexArray->setIndexBuffer(m_IndexBuffer);
 
   /****************************************************************************/
   /* Texture setup                                                            */
@@ -54,42 +57,38 @@ SandboxLayer::SandboxLayer()
   /****************************************************************************/
   /* Shaders setup                                                            */
   /****************************************************************************/
-  Crane::Shader vertex_shader;
-  vertex_shader.create(Crane::Shader::Vertex);
-  vertex_shader.compileFromFile("resources/shaders/simple.vert");
-  if (!vertex_shader.isCompiled())
-  {    
-    vertex_shader.destroy();
-    exit(EXIT_FAILURE);
-  }
+  std::ifstream vertex_fstream("resources/shaders/simple.vert");
+  std::string vertex_src;
+  vertex_src.assign(
+    std::istreambuf_iterator<char>(vertex_fstream),
+    std::istreambuf_iterator<char>()
+  );
+  Crane::Shader* vertex_shader =
+    Crane::Shader::create(Crane::Shader::Vertex, vertex_src);
 
-  Crane::Shader fragment_shader;
-  fragment_shader.create(Crane::Shader::Fragment);
-  fragment_shader.compileFromFile("resources/shaders/simple.frag");
-  if (!fragment_shader.isCompiled())
+  std::ifstream fragment_fstream("resources/shaders/simple.frag");
+  std::string fragment_src;
+  fragment_src.assign(
+    std::istreambuf_iterator<char>(fragment_fstream),
+    std::istreambuf_iterator<char>()
+  );
+  Crane::Shader* fragment_shader =
+    Crane::Shader::create(Crane::Shader::Fragment, fragment_src);
+
+  m_ShaderProgram = Crane::ShaderProgram::create();
+  m_ShaderProgram->attach(vertex_shader);
+  m_ShaderProgram->attach(fragment_shader);
+  if (!m_ShaderProgram->link())
   {
-    vertex_shader.destroy();
-    fragment_shader.destroy();
-    exit(EXIT_FAILURE);
-  }
-
-  m_ShaderProgram.create();
-  m_ShaderProgram.attach(vertex_shader);
-  m_ShaderProgram.attach(fragment_shader);
-  m_ShaderProgram.link();
-  if (!m_ShaderProgram.isLinked())
-  {
-    std::cerr << m_ShaderProgram.getInfoLog() << std::endl;
-
-    vertex_shader.destroy();
-    fragment_shader.destroy();
-    m_ShaderProgram.destroy();
+    vertex_shader->destroy();
+    fragment_shader->destroy();
+    m_ShaderProgram->destroy();
 
     exit(EXIT_FAILURE);
   }
 
-  m_ShaderProgram.detach(vertex_shader);
-  m_ShaderProgram.detach(fragment_shader);
+  m_ShaderProgram->detach(vertex_shader);
+  m_ShaderProgram->detach(fragment_shader);
 }
 
 void SandboxLayer::onUpdate(Crane::Time deltatime)
@@ -102,57 +101,57 @@ void SandboxLayer::onUpdate(Crane::Time deltatime)
   /* Transform controls */
   if (Crane::Input::isKeyPressed(Crane::Keyboard::A))
   {
-    m_Transform.move(glm::vec3(-1.f, 0.f, 0.f) * deltatime.asSeconds());
+    m_Transform.move(deltatime.asSeconds() * Crane::Vec3(-1.f, 0.f, 0.f));
   }
   else if (Crane::Input::isKeyPressed(Crane::Keyboard::D))
   {
-    m_Transform.move(glm::vec3(1.f, 0.f, 0.f) * deltatime.asSeconds());
+    m_Transform.move(deltatime.asSeconds() * Crane::Vec3(1.f, 0.f, 0.f));
   }
 
   if (Crane::Input::isKeyPressed(Crane::Keyboard::W))
   {
-    m_Transform.move(glm::vec3(0.f, 1.f, 0.f) * deltatime.asSeconds());
+    m_Transform.move(deltatime.asSeconds() * Crane::Vec3(0.f, 1.f, 0.f));
   }
   else if (Crane::Input::isKeyPressed(Crane::Keyboard::S))
   {
-    m_Transform.move(glm::vec3(0.f, -1.f, 0.f) * deltatime.asSeconds());
+    m_Transform.move(deltatime.asSeconds() * Crane::Vec3(0.f, -1.f, 0.f));
   }
 
   if (Crane::Input::isKeyPressed(Crane::Keyboard::Z))
   {
-    m_Transform.scale(glm::vec3(0.1f) * deltatime.asSeconds());
+    m_Transform.scale(deltatime.asSeconds() * Crane::Vec3(0.1f));
   }
   else if (Crane::Input::isKeyPressed(Crane::Keyboard::C))
   {
-    m_Transform.scale(glm::vec3(-0.1f) * deltatime.asSeconds());
+    m_Transform.scale(deltatime.asSeconds() * Crane::Vec3(-0.1f));
   }
 
   if (Crane::Input::isKeyPressed(Crane::Keyboard::Q))
   {
-    m_Transform.rotate(glm::vec3(0.f, 0.f, 0.1f) * deltatime.asSeconds());
+    m_Transform.rotate(deltatime.asSeconds() * Crane::Vec3(0.f, 0.f, 0.1f));
   }
   else if (Crane::Input::isKeyPressed(Crane::Keyboard::E))
   {
-    m_Transform.rotate(glm::vec3(0.f, 0.f, -0.1f) * deltatime.asSeconds());
+    m_Transform.rotate(deltatime.asSeconds() * Crane::Vec3(0.f, 0.f, -0.1f));
   }
 
   /* Camera controls */
   if (Crane::Input::isKeyPressed(Crane::Keyboard::Left))
   {
-    m_Camera.move(glm::vec3(1.f, 0.f, 0.f) * deltatime.asSeconds());
+    m_Camera.move(deltatime.asSeconds() * Crane::Vec3(1.f, 0.f, 0.f));
   }
   else if (Crane::Input::isKeyPressed(Crane::Keyboard::Right))
   {
-    m_Camera.move(glm::vec3(-1.f, 0.f, 0.f) * deltatime.asSeconds());
+    m_Camera.move(deltatime.asSeconds() * Crane::Vec3(-1.f, 0.f, 0.f));
   }
 
   if (Crane::Input::isKeyPressed(Crane::Keyboard::Up))
   {
-    m_Camera.move(glm::vec3(0.f, -1.f, 0.f) * deltatime.asSeconds());
+    m_Camera.move(deltatime.asSeconds() * Crane::Vec3(0.f, -1.f, 0.f));
   }
   else if (Crane::Input::isKeyPressed(Crane::Keyboard::Down))
   {
-    m_Camera.move(glm::vec3(0.f, 1.f, 0.f) * deltatime.asSeconds());
+    m_Camera.move(deltatime.asSeconds() * Crane::Vec3(0.f, 1.f, 0.f));
   }
 
   if (Crane::Input::isKeyPressed(Crane::Keyboard::PageUp))
@@ -172,10 +171,10 @@ void SandboxLayer::onRender() const
 {
   Crane::Layer::onRender();
 
-  m_ShaderProgram.use();
+  m_ShaderProgram->use();
 
-  m_ShaderProgram.setUniformMat4f("VP", &m_Camera.getViewProjectionMatrix()[0][0]);
-  m_ShaderProgram.setUniformMat4f("TG", &m_Transform.getTransformMatrix()[0][0]);
+  m_ShaderProgram->setUniformMat4f("VP", &m_Camera.getViewProjectionMatrix()[0][0]);
+  m_ShaderProgram->setUniformMat4f("TG", &m_Transform.getTransformMatrix()[0][0]);
   Crane::Renderer::renderIndexed(
     m_VertexArray,
     m_ShaderProgram,
