@@ -47,13 +47,13 @@ SandboxLayer::SandboxLayer()
   {
     exit(EXIT_FAILURE);
   }
-  m_Texture.create(w, h, &data[0]);
+  m_Texture = Crane::Texture::create(w, h, &data[0]);
 
   if(!Crane::BmpReader::read("resources/textures/quad2.bmp", w, h, data))
   {
     exit(EXIT_FAILURE);
   }
-  m_Texture2.create(w, h, &data[0]);
+  m_Texture2 = Crane::Texture::create(w, h, &data[0]);
 
   if (!m_Font.loadFromFile("resources/fonts/font.ttf"))
   {
@@ -99,7 +99,12 @@ SandboxLayer::SandboxLayer()
   /****************************************************************************/
   /* Camera setup                                                             */
   /****************************************************************************/
-  m_Camera.getTransform().setPosition(Crane::Math::Vec3(0.f, 0.f, 5.f));
+  m_Camera.getTransform().setPosition(Crane::Math::Vec3(0.f, 0.f, -5.f));
+
+  /****************************************************************************/
+  /* Transforms setup                                                         */
+  /****************************************************************************/
+  m_Transform2.move(Crane::Math::Vec3(4.f, 0.f, 2.f));
 }
 
 void SandboxLayer::onUpdate(Crane::Time deltatime)
@@ -167,38 +172,39 @@ void SandboxLayer::onUpdate(Crane::Time deltatime)
   /* Camera controls */
   if (Crane::Input::isKeyPressed(Crane::Keyboard::Left))
   {
-    m_Camera.getTransform().move(deltatime.asSeconds() * Crane::Math::Vec3{1.f, 0.f, 0.f});
+    m_Camera.getTransform().move(deltatime.asSeconds() * Crane::Math::Vec3{-1.f, 0.f, 0.f});
   }
   else if (Crane::Input::isKeyPressed(Crane::Keyboard::Right))
   {
-    m_Camera.getTransform().move(deltatime.asSeconds() * Crane::Math::Vec3{-1.f, 0.f, 0.f});
+    m_Camera.getTransform().move(deltatime.asSeconds() * Crane::Math::Vec3{1.f, 0.f, 0.f});
   }
 
   if (Crane::Input::isKeyPressed(Crane::Keyboard::Up))
   {
-    m_Camera.getTransform().move(deltatime.asSeconds() * Crane::Math::Vec3{0.f, -1.f, 0.f});
+    m_Camera.getTransform().move(deltatime.asSeconds() * Crane::Math::Vec3{0.f, 1.f, 0.f});
   }
   else if (Crane::Input::isKeyPressed(Crane::Keyboard::Down))
   {
-    m_Camera.getTransform().move(deltatime.asSeconds() * Crane::Math::Vec3{0.f, 1.f, 0.f});
+    m_Camera.getTransform().move(deltatime.asSeconds() * Crane::Math::Vec3{0.f, -1.f, 0.f});
   }
 
   if (Crane::Input::isKeyPressed(Crane::Keyboard::PageUp))
   {
-    m_Camera.getTransform().rotate(0.2f * deltatime.asSeconds());
+    m_Camera.getTransform().rotate(deltatime.asSeconds() * Crane::Math::Vec3(0.8f, 0.f, 0.f));
   }
   else if (Crane::Input::isKeyPressed(Crane::Keyboard::PageDown))
   {
-    m_Camera.getTransform().rotate(-0.2f * deltatime.asSeconds());
+    m_Camera.getTransform().rotate(deltatime.asSeconds() * Crane::Math::Vec3(-0.8f, 0.f, 0.f));
   }
 
   m_Camera.recomputeMatrices();
 
   m_Transform.recomputeMatrix();
-
-  m_Transform2 = m_Transform;
-  m_Transform2.move(Crane::Math::Vec3(2.f, 0.f, 2.f));
   m_Transform2.recomputeMatrix();
+
+  //m_Transform2 = m_Transform;
+  //m_Transform2.move(Crane::Math::Vec3(2.f, 0.f, 2.f));
+  //m_Transform2.recomputeMatrix();
 }
 
 void SandboxLayer::onRender() const

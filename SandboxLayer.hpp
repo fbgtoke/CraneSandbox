@@ -14,8 +14,8 @@ private:
   Crane::VertexBuffer* m_VertexBuffer;
   Crane::IndexBuffer* m_IndexBuffer;
 
-  Crane::Texture m_Texture;
-  Crane::Texture m_Texture2;
+  Crane::Texture* m_Texture;
+  Crane::Texture* m_Texture2;
   Crane::Font m_Font;
 
   Crane::ShaderProgram* m_ShaderProgram;
