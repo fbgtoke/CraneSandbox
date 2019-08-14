@@ -55,11 +55,6 @@ SandboxLayer::SandboxLayer()
   }
   m_Texture2 = Crane::Texture::create(w, h, &data[0]);
 
-  if (!m_Font.loadFromFile("resources/fonts/font.ttf"))
-  {
-    exit(EXIT_FAILURE);
-  }
-
   /****************************************************************************/
   /* Shaders setup                                                            */
   /****************************************************************************/
@@ -110,9 +105,6 @@ SandboxLayer::SandboxLayer()
 void SandboxLayer::onUpdate(Crane::Time deltatime)
 {
   Crane::Layer::onUpdate(deltatime);
-  
-  std::cout << "Frame time: " << deltatime.asSeconds() << "s ("
-            << 1.f/deltatime.asSeconds() << "fps)" << std::endl;
 
   /* Transform controls */
   if (Crane::Input::isKeyPressed(Crane::Keyboard::A))
@@ -219,7 +211,6 @@ void SandboxLayer::onRender() const
   Crane::Renderer::renderIndexed(
     m_VertexArray,
     m_ShaderProgram,
-    //m_Font.getCharacterTexture('O')
     m_Texture
   );
 
@@ -227,7 +218,6 @@ void SandboxLayer::onRender() const
   Crane::Renderer::renderIndexed(
     m_VertexArray,
     m_ShaderProgram,
-    //m_Font.getCharacterTexture('O')
     m_Texture2
   );
 }

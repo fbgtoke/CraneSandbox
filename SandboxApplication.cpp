@@ -1,4 +1,5 @@
 #include "SandboxApplication.hpp"
+#include "SandboxOverlay.hpp"
 #include "SandboxLayer.hpp"
 
 #include <glm/vec3.hpp>
@@ -16,6 +17,7 @@ SandboxApplication::SandboxApplication()
   : Crane::Application::Application()
 {
   getLayerStack().addLayer(new SandboxLayer());
+  getLayerStack().addLayer(new SandboxOverlay());
 }
 
 void SandboxApplication::onEvent(Crane::Event* e)
