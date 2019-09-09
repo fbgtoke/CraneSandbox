@@ -10,7 +10,7 @@ protected:
   void onRender() const override;
 
 private:
-  Crane::ShaderProgram* m_ShaderProgram;
+  Crane::Shader* m_Shader;
 
   Crane::VertexArray* m_VertexArray;
   Crane::VertexBuffer* m_VertexBuffer;

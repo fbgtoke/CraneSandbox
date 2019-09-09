@@ -28,9 +28,9 @@ SandboxOverlay::SandboxOverlay()
     vertices.size() * sizeof(float), (void*)&vertices[0]
   );
   m_VertexBuffer->setLayout({
-    { "position", Crane::ShaderDatatype::Float3 },
-    { "uvs", Crane::ShaderDatatype::Float2 },
-    { "normal", Crane::ShaderDatatype::Float3 }
+    { "position", Crane::Shader::Float3 },
+    { "uvs", Crane::Shader::Float2 },
+    { "normal", Crane::Shader::Float3 }
   });
   m_VertexArray->addVertexBuffer(m_VertexBuffer);
 
@@ -48,39 +48,8 @@ SandboxOverlay::SandboxOverlay()
   /****************************************************************************/
   /* Shaders setup                                                            */
   /****************************************************************************/
-  std::ifstream vertex_fstream("resources/shaders/simple.vert");
-  std::string vertex_src;
-  vertex_src.assign(
-    std::istreambuf_iterator<char>(vertex_fstream),
-    std::istreambuf_iterator<char>()
-  );
-  Crane::Shader* vertex_shader =
-    Crane::Shader::create(Crane::Shader::Vertex, vertex_src);
-
-  std::ifstream fragment_fstream("resources/shaders/text.frag");
-  std::string fragment_src;
-  fragment_src.assign(
-    std::istreambuf_iterator<char>(fragment_fstream),
-    std::istreambuf_iterator<char>()
-  );
-  Crane::Shader* fragment_shader =
-    Crane::Shader::create(Crane::Shader::Fragment, fragment_src);
-
-  m_ShaderProgram = Crane::ShaderProgram::create();
-  m_ShaderProgram->attach(vertex_shader);
-  m_ShaderProgram->attach(fragment_shader);
-  if (!m_ShaderProgram->link())
-  {
-    vertex_shader->destroy();
-    fragment_shader->destroy();
-    m_ShaderProgram->destroy();
-
-    exit(EXIT_FAILURE);
-  }
-
-  m_ShaderProgram->detach(vertex_shader);
-  m_ShaderProgram->detach(fragment_shader);
-
+  m_Shader = Crane::Shader::create("resources/shaders/simple.glsl", "simple");
+  
   /****************************************************************************/
   /* Transforms setup                                                         */
   /****************************************************************************/
@@ -92,9 +61,6 @@ SandboxOverlay::SandboxOverlay()
 void SandboxOverlay::onUpdate(Crane::Time deltatime)
 {
   Crane::Layer::onUpdate(deltatime);
-  
-  //std::cout << "Frame time: " << deltatime.asSeconds() << "s ("
-  //          << 1.f/deltatime.asSeconds() << "fps)" << std::endl;
 
   std::ostringstream ss;
   ss << 1.f/deltatime.asSeconds() << "fps";
@@ -107,12 +73,12 @@ void SandboxOverlay::onRender() const
 {
   Crane::Layer::onRender();
 
-  m_ShaderProgram->use();
-  m_ShaderProgram->setUniformMat4f("VP", &m_Camera.getViewProjectionMatrix()[0][0]);
-  m_ShaderProgram->setUniformMat4f("TG", &m_Transform.getTransformMatrix()[0][0]);
+  m_Shader->use();
+  m_Shader->setUniformMat4f("VP", &m_Camera.getViewProjectionMatrix()[0][0]);
+  m_Shader->setUniformMat4f("TG", &m_Transform.getTransformMatrix()[0][0]);
 
   Crane::Renderer::render(
-    m_ShaderProgram,
+    m_Shader,
     m_Text
   );
 }

@@ -17,7 +17,7 @@ private:
   Crane::Texture* m_Texture;
   Crane::Texture* m_Texture2;
 
-  Crane::ShaderProgram* m_ShaderProgram;
+  Crane::Shader* m_Shader;
 
   Crane::PerspectiveCamera m_Camera;
 
